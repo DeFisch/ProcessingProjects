@@ -10,6 +10,8 @@ float camAX = 54.0;
 float camAY = 37.0;
 float camAZ = 0.0;
 float speed = 5;
+float prevMouseX = width/2;
+float prevMouseY = height/2;
 boolean planetDropped = false;
 float pickX;
 float pickY;
@@ -226,16 +228,21 @@ void draw() {
   
   
   if(mouseX !=0 && mouseY != 0){
-    camAX -= (mouseX-width/2)/4;
-    camAY += (mouseY-height/2)/4;
+    camAX -= (mouseX-prevMouseX)/4;
+    camAY += (mouseY-prevMouseY)/4;
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
     if(camAY > 89)
       camAY = 89;
     if(camAY < -89)
       camAY = -89;
   }
   camAX %= 360;
-  
-  ((GLWindow)getSurface().getNative()).warpPointer(width / 2, height / 2);
+  if(abs(mouseX-width/2) > width/4 || abs(mouseY-height/2) > height/4){
+    ((GLWindow)getSurface().getNative()).warpPointer(width / 2, height / 2);
+    prevMouseX = width/2;
+    prevMouseY = height/2;
+  }
   // set clipping distance and camera angle
   float fov = PI/3.0;
   float cameraZ = (height/2.0) / tan(fov/2.0);
