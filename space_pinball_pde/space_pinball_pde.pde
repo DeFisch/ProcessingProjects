@@ -1,4 +1,4 @@
-import java.awt.Robot;
+import com.jogamp.newt.opengl.GLWindow;
 
 
 boolean moving = false; // mouse movement
@@ -21,8 +21,6 @@ ArrayList<Planet> pList = new ArrayList<Planet>();
 ArrayList<Explosion> exList = new ArrayList<Explosion>();
 PGraphics gui;
 
-Robot robot;
-
 
 //assets
 PImage sunTexture;
@@ -33,14 +31,7 @@ PShape sun;
 void setup() {
   fullScreen(P3D);
   frameRate(60);
-  try{
-    robot = new Robot();
-  }
-  catch(Exception e){
-    print(e);
-  }
   smooth(4);
-  robot.mouseMove(width/2, height/2);
   explosionTexture = loadImage("explosion.jpg");
   sun = createShape(SPHERE, 30);
   sunTexture = loadImage("sun.jpg");
@@ -227,7 +218,6 @@ void draw2DLayer(PGraphics gui){
 
 
 void draw() {
-  
   noCursor();
   
   background(0);
@@ -236,16 +226,16 @@ void draw() {
   
   
   if(mouseX !=0 && mouseY != 0){
-    camAX -= (mouseX-width/2)/1;
-    camAY += (mouseY-height/2)/1;
+    camAX -= (mouseX-width/2)/4;
+    camAY += (mouseY-height/2)/4;
     if(camAY > 89)
       camAY = 89;
     if(camAY < -89)
       camAY = -89;
   }
   camAX %= 360;
-  robot.mouseMove(width/2, height/2);
   
+  ((GLWindow)getSurface().getNative()).warpPointer(width / 2, height / 2);
   // set clipping distance and camera angle
   float fov = PI/3.0;
   float cameraZ = (height/2.0) / tan(fov/2.0);

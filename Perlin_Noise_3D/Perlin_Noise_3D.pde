@@ -1,4 +1,4 @@
-import java.awt.Robot;
+import com.jogamp.newt.opengl.GLWindow;
 
 float posX = width/2 + 10000+random(10000);
 float posY = height/2 + 10000+random(10000);
@@ -15,22 +15,15 @@ float noiseScale = 20;
 boolean[][][] map = new boolean[loadCapacity*2][loadCapacity*2][loadCapacity*2];
 boolean moving = false;
 boolean paused = false;
-Robot robot;
 
 void setup() {
   fullScreen(P3D);
   frameRate(60);
   fill(204);
-  try{
-    robot = new Robot();
-  }
-  catch(Exception e){
-    print(e);
-  }
-  
   loadMap(mapX, mapY, mapZ);
   
-  robot.mouseMove(width/2, height/2);
+  
+  ((GLWindow)getSurface().getNative()).warpPointer(width / 2, height / 2);
 }
 
 boolean[][][] loadMap(int x, int y, int z){
@@ -124,7 +117,7 @@ void draw() {
       camAY = -90;
   }
   camAX %= 360;
-  robot.mouseMove(width/2, height/2);
+  ((GLWindow)getSurface().getNative()).warpPointer(width / 2, height / 2);
   
   camera(posX, posY, posZ, // eyeX, eyeY, eyeZ
          posX + sin(radians(camAX)) * cos(radians(camAY)), sin(radians(camAY)) + posY, posZ + cos(radians(camAX)) * cos(radians(camAY)), // centerX, centerY, centerZ
