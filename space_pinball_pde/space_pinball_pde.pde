@@ -1,5 +1,5 @@
 import com.jogamp.newt.opengl.GLWindow;
-
+import processing.sound.*;
 
 boolean moving = false; // mouse movement
 int persp = -1;
@@ -28,24 +28,36 @@ PGraphics gui;
 PImage sunTexture;
 PImage explosionTexture;
 PShape sun;
+SoundFile welcome;
+SoundFile burnt;
+SoundFile explosion;
+SoundFile drop;
 
 
 void setup() {
   fullScreen(P3D);
   frameRate(60);
   smooth(4);
+  welcome = new SoundFile(this,"welcome.wav");
+  burnt = new SoundFile(this,"burn.mp3");
+  explosion = new SoundFile(this,"explosion.wav");
+  drop = new SoundFile(this,"drop.mp3");
   explosionTexture = loadImage("explosion.jpg");
   sun = createShape(SPHERE, 30);
   sunTexture = loadImage("sun.jpg");
   pList.add(new Planet((float)0,(float)0,(float)0,(float)0,(float)1000,color(random(255),random(255),random(255))));
   
   gui = createGraphics(width, height, JAVA2D );
+  explosion.amp(0.2);
+  burnt.amp(0.4);
+  welcome.play();
 }
 
 void keyPressed() {
   if(key == 'w' || key == 's' || key == 'a' || key == 'd')
     moving = true;
   if(key == ' '){
+    drop.play();
     posX = -446;
     posY = -294;
     posZ = -335;
@@ -57,8 +69,10 @@ void keyPressed() {
       else
         persp = -1;
   }
-  if(key == 'f')
+  if(key == 'f'){
+    drop.play();
     flashlightOn = !flashlightOn;
+  }
   if(key == '-')
     planetRadius -= 1;
   if(key == '=')
@@ -81,6 +95,7 @@ void mousePressed(){
 }
 
 void mouseReleased(){
+   drop.play();
    planetDropped = false;
    PVector mousePath = new PVector(pickX-endPickX, pickY-endPickY);
    pList.add(new Planet(pickX, pickY, 
@@ -161,6 +176,8 @@ void drawPlanets(){
    if(abs(p.pos.x) >= 2000 || abs(p.pos.y) >= 2000 || (abs(p.pos.x) <= 30 && abs(p.pos.y) <= 30)){
       pList.remove(i);
       i--;
+      if(abs(p.pos.x) <= 30 && abs(p.pos.y) <= 30)
+        burnt.play();
       continue;
    }
    for (int j = 0; j < pList.size(); j++){
@@ -171,6 +188,7 @@ void drawPlanets(){
       else p.attract(pList.get(j));
       if(p.distanceTo(pList.get(j)) < sqrt(p.m)+sqrt(pList.get(j).m)){
         Planet p2 = pList.get(j);
+        explosion.play();
          exList.add(new Explosion(explosionTexture, (p.pos.x + p2.pos.x)/2, (p.pos.y + p2.pos.y)/2, sqrt(p.m)+sqrt(pList.get(j).m)));
          if(i > j){
            pList.remove(j);
@@ -195,11 +213,12 @@ void draw2DLayer(PGraphics gui){
   gui.text("Drag mouse to place and shoot planet",10,65);
   gui.text("Spacebar to change perspective",10,80);
   gui.text("F to turn on/off flashlight",10,95);
-  gui.text("Mouse scroll to adjust planet size (or -/= key)",10,110);
-  gui.text("current planet size: " + (int)(planetRadius*10)/10.0, 10, 135);
+  gui.text("Framerate: " + (int)(frameRate),10,110);
+  gui.text("Mouse scroll to adjust planet size (or -/= key)",10,135);
+  gui.text("current planet size: " + (int)(planetRadius*10)/10.0, 10, 150);
   gui.push();
   gui.noStroke();
-  gui.ellipse(10 + planetRadius*3/2, 150 + planetRadius*3/2, planetRadius*3, planetRadius*3);
+  gui.ellipse(10 + planetRadius*3/2, 165 + planetRadius*3/2, planetRadius*3, planetRadius*3);
   gui.pop();
   
   gui.stroke(255,0,0);

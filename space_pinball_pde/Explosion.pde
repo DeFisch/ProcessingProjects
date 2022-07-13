@@ -4,7 +4,7 @@ class Explosion{
  float y;
  PImage t;
  float curR = 1;
- float frames = 5;
+ float frames = 10;
  Explosion(PImage texture, float posX, float posY, float radius){
    t = texture;
    x = posX;
